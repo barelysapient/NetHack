@@ -1,7 +1,8 @@
 set -x
 export VSVER=2017
 export MSVER=14.16.27023
-export SDKVER=10.0.17763.0
+#export SDKVER=10.0.17763.0
+export SDKVER=10.0.18362.0
 export FRAMEVER=4.0.30319
 export NETFXVER=4.6.1
 export WKITVER=10.0.17134.0

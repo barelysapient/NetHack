@@ -93,6 +93,9 @@
 /* Stuff to help the user with some common, yet significant errors */
 #define INTERJECT_PANIC 0
 #define INTERJECTION_TYPES (INTERJECT_PANIC + 1)
+#ifndef genericptr_t
+typedef genericptr genericptr_t; /* (void *) or (char *) */
+#endif
 extern void interject_assistance(int, int, genericptr_t, genericptr_t);
 extern void interject(int);
 

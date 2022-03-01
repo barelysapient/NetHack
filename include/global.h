@@ -62,7 +62,7 @@
  * type xchar: small integers (typedef'd as signed char,
  * so in the range -127 - 127), usually coordinates.
  */
-typedef schar xchar;
+typedef signed char xchar;
 
 #ifdef __MINGW32__
 /* Resolve conflict with Qt 5 and MinGW-w32 */
@@ -84,7 +84,7 @@ enum optchoice { opt_in, opt_out};
 /*
  * type nhsym: loadable symbols go into this type
  */
-typedef uchar nhsym;
+typedef unsigned char nhsym;
 
 #ifndef STRNCMPI
 #ifndef __SASC_60 /* SAS/C already shifts to stricmp */
