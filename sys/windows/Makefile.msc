@@ -372,6 +372,25 @@ PDCINCL = /I$(PDCURSES_TOP) /I$(PDCSRC) /I$(PDCWINCON)
 PDCLIB =
 PDCDEP =
 !ENDIF
+#===============-=================================================
+# LaunchDarkly build macros
+# Enables remote feature flagging via launchdarkly.com
+# C client SDK obtained from https://github.com/launchdarkly/c-client-sdk/releases (2.4.3) and extracted into sys\windows\launchdarkly
+#=================================================================
+ADD_LAUNCHDARKLY=Y
+!IF "$(ADD_LAUNCHDARKLY)" == "Y"
+LAUNCHDARKLYTOP    =..\sys\windows\launchdarkly
+LAUNCHDARKLYINCL   = /I$(LAUNCHDARKLYTOP)\include
+LAUNCHDARKLYLIB    = $(O)$(LAUNCHDARKLYTOP)\lib\ldclientapi.lib
+LAUNCHDARKLYDLL    = $(O)$(LAUNCHDARKLYTOP)\lib\ldclientapi.dll
+LAUCHDARKLYCLIENT  = $(LAUNCHDARKLYDLL) $(LAUNCHDARKLYLIB)
+!ELSE
+LAUNCHDARKLYINCL   =
+LAUNCHDARKLYLIB    =
+LAUNCHDARKLYDLL    =
+LAUCHDARKLYCLIENT  =
+!ENDIF
+
 
 HACKINCL = $(INCL)\align.h $(INCL)\artifact.h $(INCL)\artilist.h \
 	$(INCL)\attrib.h $(INCL)\botl.h $(INCL)\color.h $(INCL)\config.h \
@@ -785,7 +804,7 @@ conlibs     = $(baselibs)
 guilibs     = $(winlibs)
 #
 
-INCLDIR= /I..\include /I..\sys\windows $(LUAINCL)
+INCLDIR= /I..\include /I..\sys\windows $(LUAINCL) $(LAUNCHDARKLYINCL)
 
 #==========================================
 # Util builds
@@ -1006,11 +1025,11 @@ GAMEOBJ=$(GAMEOBJ:^ =^
 
 $(GAMEDIR)\NetHack.exe : $(O)gamedir.tag $(O)tile.o $(O)consoletty.o $(O)guistub.o \
 			$(ALLOBJ) $(TTYOBJ) $(O)date.o $(O)console.res \
-			$(LUATARGETS) $(PDCLIB)
+			$(LUATARGETS) $(PDCLIB) $(LAUNCHDARKLYDEPS)
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(conlflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB /MAP:$(O)$(@B).MAP \
-		$(LIBS) $(PDCLIB) $(LUALIB) \
+		$(LIBS) $(PDCLIB) $(LUALIB) $(LAUNCHDARKLYLIB) \
 		$(conlibs) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(TTYOBJ)
@@ -1037,7 +1056,7 @@ $(GAMEDIR)\NetHackW.exe : $(O)gamedir.tag $(O)tile.o $(O)ttystub.o \
 	@if not exist $(GAMEDIR)\*.* mkdir $(GAMEDIR)
 	@echo   Linking $(@:\=/)
 	$(link) $(lflagsBuild) $(guilflags) /STACK:2048 /PDB:$(GAMEDIR)\$(@B).PDB \
-		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(LUALIB) \
+		/MAP:$(O)$(@B).MAP $(LIBS) $(PDCLIB) $(LUALIB) ($LAUNCHDARKLYDEPS) \
 		$(guilibs) $(COMCTRL) $(BCRYPT) -out:$@ @<<$(@B).lnk
 		$(GAMEOBJ)
 		$(GUIOBJ)

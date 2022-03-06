@@ -26,7 +26,7 @@
   <Import Project="$(vsDir)files.props" />
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(IncDir);$(SysWindDir);$(SysShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(IncDir);$(SysWindDir);$(SysShareDir);$(LuaDir);$(RootDir)sys\windows\launchdarkly\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>WIN32CON;DLB;MSWIN_GRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
   </ItemDefinitionGroup>

@@ -232,7 +232,9 @@ moverock(void)
             mtmp = m_at(rx, ry);
 
             /* KMH -- Sokoban doesn't let you push boulders diagonally */
-            if (Sokoban && u.dx && u.dy) {
+            // Re-evaluate LaunchDarkly feature flag (updates in background)
+            g.ldflag_easy_sokoban = LDBoolVariation(g.ldclient, "easy-sokoban", 0);
+            if (Sokoban && u.dx && u.dy && !g.ldflag_easy_sokoban) {
                 if (Blind)
                     feel_location(sx, sy);
                 pline("%s won't roll diagonally on this %s.",

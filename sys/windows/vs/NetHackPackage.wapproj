@@ -135,7 +135,6 @@
       <Link>NetHackW\sysconf.template</Link>
     </Content>
     <Content Include="Images\Wide310x150Logo.scale-400.png" />
-    <None Include="NetHackPackage_StoreKey.pfx" />
     <None Include="Package.StoreAssociation.xml" />
   </ItemGroup>
   <ItemGroup>

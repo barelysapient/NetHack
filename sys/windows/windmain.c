@@ -15,6 +15,12 @@
 #include <errno.h>
 #include <ShlObj.h>
 
+/* Include LaunchDarkly for remote feature flagging (see main function below) */
+#include <launchdarkly/api.h>
+#define LD_INIT_TIMEOUT_MILLISECONDS 3000
+/* Set LD_MOBILE_KEY to your LaunchDarkly mobile key */
+#define LD_MOBILE_KEY "mob-dcd2438a-a940-457c-80a9-e34862332a59"
+
 #if !defined(SAFEPROCS)
 #error You must #define SAFEPROCS to build windmain.c
 #endif
@@ -604,7 +610,7 @@ attempt_restore:
         if (g.program_state.in_self_recover) {
             g.program_state.in_self_recover = FALSE;
             set_savefile_name(TRUE);
-	}
+	    }
     }
 
     if (!resuming) {
@@ -628,8 +634,43 @@ attempt_restore:
 
         //	iflags.debug_fuzzer = TRUE;
 
+        // Begin LaunchDarkly section
+        char unique_user_key[256];
+        sprintf(unique_user_key, "nethack-player-key-%s", g.plname);
+        for (size_t i = 0; i < strlen(unique_user_key); i++) {
+            unique_user_key[i] = tolower((unsigned char) unique_user_key[i]);
+            if (unique_user_key[i] == ' ') {
+                unique_user_key[i] = '-';
+            }
+        }
+        g.lduser = LDUserNew(unique_user_key);
+        LDUserSetName(g.lduser, g.plname);
+        struct LDJSON *lduser_json_attr, *lduser_json_role_value;
+        lduser_json_attr = LDNewObject();
+        lduser_json_role_value = LDNewText(g.pl_character);
+        LDObjectSetKey(lduser_json_attr, "role", lduser_json_role_value);
+        LDUserSetCustom(g.lduser, lduser_json_attr);
+
+        LDConfigureGlobalLogger(LD_LOG_INFO, LDBasicLogger);
+        g.ldconfig = LDConfigNew(LD_MOBILE_KEY);
+
+        g.ldclient = LDClientInit(g.ldconfig, g.lduser, LD_INIT_TIMEOUT_MILLISECONDS);
+
+        if (!LDClientIsInitialized(g.ldclient)) {
+            /*printf("*** SDK failed to initialize\n\n");*/
+            nethack_exit(EXIT_FAILURE); // "graceful" exit
+        }
+        // End LaunchDarkly Section
+
         moveloop(resuming);
-    nethack_exit(EXIT_SUCCESS);
+
+        // Here we ensure that the SDK shuts down cleanly and has a chance to
+        // deliver analytics events to LaunchDarkly before the program exits.
+        // If analytics events are not delivered, the user properties and flag
+        // usage statistics will not appear on your dashboard.
+        LDClientClose(g.ldclient);
+        
+        nethack_exit(EXIT_SUCCESS);
     /*NOTREACHED*/
     return 0;
 }

@@ -21,7 +21,7 @@
       <AdditionalOptions>/Gs /Oi- /w44774 %(AdditionalOptions)</AdditionalOptions>
       <Optimization>Disabled</Optimization>
       <OmitFramePointers>true</OmitFramePointers>
-      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(WinWin32Dir);$(IncDir);$(SysWindDir);$(SysShareDir);$(WinShareDir);$(LuaDir);$(RootDir)sys\windows\launchdarkly\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>TILES;_WINDOWS;DLB;MSWIN_GRAPHICS;SAFEPROCS;NOTTYGRAPHICS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <ResourceCompile>
@@ -30,7 +30,9 @@
     </ResourceCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
-      <AdditionalDependencies>comctl32.lib;winmm.lib;bcrypt.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>comctl32.lib;winmm.lib;bcrypt.lib;$(RootDir)sys\windows\launchdarkly\lib\ldclientapi.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ShowProgress Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotSet</ShowProgress>
+      <ShowProgress Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotSet</ShowProgress>
     </Link>
     <Manifest>
       <AdditionalManifestFiles>$(WinWin32Dir)NethackW.exe.manifest;%(AdditionalManifestFiles)</AdditionalManifestFiles>

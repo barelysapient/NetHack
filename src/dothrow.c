@@ -818,7 +818,9 @@ hurtle_step(genericptr_t arg, int x, int y)
         && bad_rock(g.youmonst.data, u.ux, y)
         && bad_rock(g.youmonst.data, x, u.uy)) {
         /* Move at a diagonal. */
-        if (Sokoban) {
+        // Re-evaluate LaunchDarkly feature flag (updates in background)
+        g.ldflag_easy_sokoban = LDBoolVariation(g.ldclient, "easy-sokoban", 0);
+        if (Sokoban && !g.ldflag_easy_sokoban) {
             You("come to an abrupt halt!");
             return FALSE;
         }

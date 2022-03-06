@@ -3,6 +3,8 @@
 /*-Copyright (c) Michael Allison, 2007. */
 /* NetHack may be freely redistributed.  See license for details. */
 
+#include <launchdarkly/api.h>
+
 #ifndef DECL_H
 #define DECL_H
 
@@ -689,6 +691,15 @@ typedef long cmdcount_t;	/* Command counts */
  * which came with them don't make much sense out of their original context.
  */
 struct instance_globals {
+    /* Globals for LaunchDarkly client (singleton, instantiated in windmain.c) */
+    struct LDConfig *ldconfig;
+    struct LDClient *ldclient;
+    struct LDUser *lduseranon;
+    struct LDUser *lduser;
+
+    // LaunchDarkly feature flags, accessible via global "g" instance of this struct
+    LDBoolean ldflag_skip_to_sokoban; /* Skip directly to Sokoban puzzle if true */
+    LDBoolean ldflag_easy_sokoban;    /* Simplify Sokoban puzzle if true */
 
     struct _cmd_queue *command_queue;
 

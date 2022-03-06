@@ -1,3 +1,47 @@
+
+Fork of NetHack 3.7.0 to experiment with LaunchDarkly (launchdarkly.com) feature flags
+
+Compiles with VS 2022 Community Edition with "Desktop development with C++" and "Universal Windows Platform development" options selected in VS2022 installer.
+Projects are currently configured for Windows SDK version 10.0.18363.0 - if you don't have it, right-click individual projects in the Solution Explorer and choose Retarget Projects.
+
+As a manual step (once, not every time you build), the "symbols.template" file in the final binary output folder where you build NetHack.exe/NetHackW.exe must be renamed "symbols" (no .template suffix).
+
+A copy of the LaunchDarkly C SDK (version 2.4.3, released 2022-02-16, https://github.com/launchdarkly/c-client-sdk/releases) is included in this repository at sys\windows\launchdarkly.
+
+The ldclientapi.dll from sys\windows\launchdarkly was also copied into binary\Release\x86\ and must be made available to NetHack.exe/NetHackW.exe if you build under a different release target (e.g., Debug).
+
+What was implemented:
+
+1. When you start the game, the LaunchDarkly client API is initialized as a singleton (for now, it is stored in the "g" global struct used for other NetHack global variables).
+
+2. As part of the client initialization, there is a hard-coded LaunchDarkly "mobile key" (at the top of sys\windows\windmain.c) that associates the client with a specific LaunchDarkly "project" and "environment"
+   Replace this mobile key with your own if you want to control the LaunchDarkly side too.  You can sign up for a free trial from launchdarkly.com.
+
+3. After you identify yourself to the game, your character name and role are transmitted to LaunchDarkly's remote servers to identify your client session.  No other user-identifying information is transmitted.
+
+4. LaunchDarkly's remote servers transmit feature flag values (currently using only simple booleans - true/false) to your client while it is running based on rules defined through LaunchDarkly's web portal.
+
+5. Two feature flags are currently checked:  'skip-to-sokoban' and 'easy-sokoban'.
+
+   If the skip flag is true, when the player next moves they will be teleported to the NetHack "Sokoban" dungeon, a puzzle involving moving boulders to open a path.
+   If the easy flag is true, when the player attempts to roll a boulder diagonally or squeeze through a diagonal gap between boulders, they will be allowed to do so.  Normally, these actions are prevented. 
+
+6. Currently, the LaunchDarkly targeting rules for these flags have the following conditions:
+
+   Any character whose role is "Archeologist" is automatically added to the LaunchDarkly "Segment" called "testers"
+   Any character in the "testers" Segment will have the 'skip-to-sokoban' feature flag enabled
+   Any character whose name is "Bruce Banner" will have the 'easy-sokoban' feature flag enabled
+   Any character whose role is "Archeologist" will have the 'easy-sokoban' feature flag enabled
+   Any character whose name is "indy" will have the 'easy-sokoban' feature flag disabled (even if he is an Archeologist) ... he never has it easy
+
+7. If changes are made in the LaunchDarkly web portal to change the flag values being served while a game is running, these changes will affect the game in progress (usually in under a second).
+
+   If the 'skip-to-sokoban' flag changes after the game has started, it will only have an effect if the character is not already in Sokoban (there is no teleporting out, only teleporting in).
+   If the 'easy-sokoban' flag changes after the game has started, it will take effect on the next attempt to roll a boulder diagonally or squeeze through a diagonal gap between them.
+
+
+
+
          NetHack 3.7.0 work-in-progress -- General information
 
 NetHack 3.7 is an enhancement to the dungeon exploration game NetHack,

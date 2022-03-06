@@ -191,6 +191,13 @@ const struct Race urace_init_data = {
 };
 
 const struct instance_globals g_init = {
+    /* LaunchDarkly client globals (singleton) */
+    NULL, // struct LDConfig *ldconfig;
+    NULL, // struct LDClient *ldclient;
+    NULL, // struct LDUser *lduseranon;
+    NULL, // struct LDUser *lduser;
+    0,    // Feature flag: ldflag_skip_to_sokoban
+    0,    // Feature flag: ldflag_easy_sokoban
 
     NULL, /* command_queue */
 

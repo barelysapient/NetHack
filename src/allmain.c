@@ -347,6 +347,19 @@ moveloop_core(void)
                     }
                 }
             }
+
+            // Re-evaluate LaunchDarkly feature flag (updates in background)
+            g.ldflag_skip_to_sokoban = LDBoolVariation(g.ldclient, "skip-to-sokoban", 0);
+            if (g.ldflag_skip_to_sokoban == 1 && !In_sokoban(&u.uz)) {
+                d_level newlevel;
+                newlevel.dnum = sokoban_dnum; // decl.h
+                newlevel.dlevel = 5; // bottom level
+
+                schedule_goto(&newlevel, UTOTYPE_NONE, (char *) 0,
+                              flags.verbose
+                                  ? "You materialize on a different level!"
+                                  : (char *) 0);
+            }
         } while (g.youmonst.movement < NORMAL_SPEED); /* hero can't move */
 
         /******************************************/
